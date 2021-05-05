@@ -1,0 +1,226 @@
+
+/******************************************************************************
+** DAT038, TDA417  Datastrukturer och algoritmer, LP2 2020
+** Lab 4: Path finder
+*******************************************************************************/
+
+Name of lab group: [...]
+Group member A:    [Zakaria Hersi]
+Group member B:    [Sattar Akbari]
+Group member C:    [...]
+
+
+/******************************************************************************
+** 1. List the minimal cost, shortest path, and nr of loop iterations,
+**    for each of the following invocations.
+******************************************************************************/
+
+> java RunPathFinder ucs AdjacencyGraph graphs/AdjacencyGraph/citygraph-SE.txt Lund Kiruna
+
+loop iterations: [5427]
+minimal cost:    [ 1826]
+shortest path:   [ Lund -> Löddeköpinge -> Hjärnarp -> Åled -> Oskarström -> ... -> Storuman -> Sorsele -> Jokkmokk -> Gällivare -> Kiruna]
+
+> java RunPathFinder ucs NPuzzle 3 "/HFG/BED/C_A/" "/ABC/DEF/GH_/"
+
+loop iterations: [483573]
+minimal cost:    [31.0]
+shortest path:   [/HFG/BED/C_A/ -> /HFG/BED/CA_/ -> /HFG/BE_/CAD/ -> /HFG/B_E/CAD/ -> /H_G/BFE/CAD/ -> ... -> /AC_/DBE/GHF/ -> /A_C/DBE/GHF/ -> /ABC/D_E/GHF/ -> /ABC/DE_/GHF/ -> /ABC/DEF/GH_/]
+
+> java RunPathFinder astar NPuzzle 3 "/HFG/BED/C_A/" "/ABC/DEF/GH_/"
+
+loop iterations: [32375]
+minimal cost:    [31.0]
+
+> java RunPathFinder ucs NPuzzle 3 "/HGF/BED/C_A/" "/ABC/DEF/GH_/"
+
+loop iterations: [...] Error
+minimal cost:    [...] Error
+shortest path:   [...] error 
+
+> java RunPathFinder ucs GridGraph graphs/GridGraph/AR0011SR.map "23:161" "130:211"
+
+loop iterations: [159327]
+minimal cost:    [ 366.40411229460744]
+shortest path:   [23:161 -> 23:160 -> 23:159 -> 23:158 -> 23:157 -> ... -> 132:207 -> 131:208 -> 131:209 -> 130:210 -> 130:211]
+
+> java RunPathFinder astar GridGraph graphs/GridGraph/AR0011SR.map "23:161" "130:211"
+
+loop iterations: [95160]
+minimal cost:    [366.4041122946075]
+
+> java RunPathFinder ucs WordLadder graphs/WordLadder/words-saldo.txt syster broder
+
+loop iterations: [71182]
+minimal cost:    [11.0]
+shortest path:   [syster -> sylter -> sylten -> synten -> synden -> ... -> bauden -> bruden -> bröden -> bröder -> broder]
+
+> java RunPathFinder astar WordLadder graphs/WordLadder/words-saldo.txt syster broder
+
+loop iterations: [391]
+minimal cost:    [11]
+
+
+/******************************************************************************
+** 2. For each of the three classes GridGraph, WordLadder and NPuzzle,
+**    what is the approximate improvement in the nr. of iterations,
+**    by running A* instead of UCS?
+**    Try a number of different examples per class.
+******************************************************************************/
+
+GridGraph:  [For small inputs the difference aint really that much but aStar gets faster and faster proportionatly for bigger inputs than usc same goes for the cost]
+
+
+WordLadder: [The difference is between about 120 to 70 times in speed. For wordladder the same argument as above goes aStar goes faster than usc for the larger iteration]
+
+NPuzzle:    [The difference is a about a factor of 100.]
+
+
+/******************************************************************************
+** 3. For which of the three classes GridGraph, WordLadder and NPuzzle,
+**    did the heuristics .guessCost() have the most impact?
+**    Why do you think this is the case?
+******************************************************************************/
+
+[We would think that Its easier to guess the cost with the method in an letter counting / ecluidian distance than the manhattan method that is used in GridGraph
+so the conclusion is for wordLadder and Npuzzle have the bigger impact with the heuristics .guessCost(). ]
+
+
+/******************************************************************************
+** 4. Give pseudo-code of the following methods that you implemented
+******************************************************************************/
+
+WordLadder.outgoingEdges(String w):
+    [
+        Character ch;
+        List edges ;= new LinkedList;
+        for i = 0 to word.length
+            for ch : charset
+             if Character ch is at the index i in word
+             countinue;
+        newWord = word with c changed to ch
+        if newWord is in dictionary 
+        add newWord to DirectedEdge
+
+    return edges
+    ]
+
+
+WordLadder.guessCost(String w, String u):
+    [
+
+        double diff := 0
+        char s := w from char to array
+         char t := w from char to array
+
+
+         for i = 0 to s.length
+
+         int j := u index of s of i
+         diff += absolut value of ((i-j))%(n+1)
+          diff += absolut value of (i-j) /(n+1)
+
+
+          return diff;
+    ]
+
+
+GridGraph.guessCost(Coord p, Coord q):
+    
+    [
+        return sqaure root of x value of q-p to the power of 2 + y value of q-p to the power of 2 
+    ]
+
+
+/******************************************************************************
+** 5. Give pseudo-code of the method .searchAstar() in PathFinder
+******************************************************************************/
+
+PathFinder.searchAstar(Node start, Node goal):
+    [
+        int iteration := 0
+        double  costTonext,costToend;
+
+        visited = new Hashset
+        pqueue = new Priorityqueue
+        
+        while not pqueue is empty
+        entry = pqueue remove
+        iteration := iteration + 1
+
+        if entery.node = visited:
+        countinue:
+
+        entry.node  = visted;
+
+        if entery = goals
+        return result(entery);
+
+        for nodes in outgoingEdges:
+
+        costTonest := entery.costTohere + edge.weight
+        costToend := costTonext + edge.guessCost
+
+        pqueue := entery, costToend, costTonext;
+
+        return result;
+
+
+    ]
+
+
+/******************************************************************************
+** 6. What are the main differences between your implementations 
+**    of .searchAstar() and .searchUCS()?
+******************************************************************************/
+
+[For the USC when it looks for the next node it simply chooses the one closest to it even though it may have
+a bigger cost than taking a "visual detour(when looking at a graph visually)" but for the aStar it predicts
+the path and eventually the goal with the  lowest cost using the heuristics of the guessCost method.]
+
+
+
+/******************************************************************************
+** Appendix: General information
+**
+** A. Approximately how many hours did you spend on the assignment?
+******************************************************************************/
+
+[Zakaria Hersi]:  [11]
+[Sattar Akbari]:  [10]
+[..group member..]:  [..hours..]
+
+
+/******************************************************************************
+** B. Are there any known bugs / limitations?
+******************************************************************************/
+
+For the question 1D we simply get an error message for the call where we cant find the pathof the requested
+and it takes 0 iteration. We dont know if that is something that should be right or weong.
+
+
+/******************************************************************************
+** C. Did you collaborate with any other students on this lab?
+**    If so, please write in what way you collaborated and with whom.
+**    Also include any resources (including the web) that you may
+**    may have used in creating your design.
+******************************************************************************/
+
+[...]
+
+
+/******************************************************************************
+** D. Describe any serious problems you encountered.                    
+******************************************************************************/
+
+[...]
+
+
+/******************************************************************************
+** E. List any other comments here.
+**    Feel free to provide any feedback on how much you learned 
+**    from doing the assignment, and whether you enjoyed it.                                             
+******************************************************************************/
+
+[...]
+
